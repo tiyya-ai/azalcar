@@ -1051,6 +1051,7 @@
         border-radius: 12px;
         max-width: 600px;
         width: 100%;
+        margin: 20px;
         position: relative;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
@@ -1198,6 +1199,21 @@
         }
         .modal-box-cars-style {
             padding: 24px;
+            width: calc(100% - 32px);
+            margin: 16px;
+        }
+        .cars-modal-title {
+            font-size: 22px;
+        }
+        .cars-modal-phone {
+            font-size: 16px;
+        }
+        .cars-form-row {
+            flex-direction: column;
+            gap: 12px;
+        }
+        .cars-input {
+            width: 100%;
         }
     }
     
