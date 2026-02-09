@@ -127,12 +127,107 @@
         }
         
         /* Breadcrumbs */
-        .breadcrumbs { font-size: 12px; color: #555; margin-bottom: 12px; }
-        .breadcrumbs a { text-decoration: underline; color: #555; }
+        .breadcrumbs { font-size: 12px; color: #555; margin-bottom: 24px; }
+        .breadcrumbs a { text-decoration: none; color: #555; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+
+        /* Modern Search Improvements */
+        .modern-search-header { margin-bottom: 32px; }
+        
+        .pills-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 8px 0 20px;
+            scrollbar-width: none;
+        }
+        .pills-container::-webkit-scrollbar { display: none; }
+        
+        .pill-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #F1F1F1;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .pill-item:hover { background: #E5E5E5; }
+        .pill-item.active { background: #1a1a1a; color: white; }
+        .pill-item i.fa-times { font-size: 10px; margin-left: 4px; opacity: 0.6; }
+        
+        .filter-trigger-btn {
+            background: #1a1a1a;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .save-search-btn {
+            background: white;
+            border: 1.5px solid #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .save-search-btn:hover { background: #f8fafc; }
+
+        .modern-search-bar-row { position: relative; margin-bottom: 32px; }
+        .modern-search-bar-input {
+            width: 100%;
+            height: 56px;
+            background: white;
+            border: 1.5px solid #6041E0;
+            border-radius: 30px;
+            padding: 0 50px 0 24px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            box-shadow: 0 4px 20px rgba(96, 65, 224, 0.1);
+        }
+        .modern-search-bar-input::placeholder { color: #666; font-weight: 400; }
+        .modern-search-bar-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #1a1a1a;
+        }
 
         @media (max-width: 900px) {
             .results-main-layout { grid-template-columns: 1fr; }
-            .filter-sidebar { display: none; /* Hide for mobile, would need mobile filter modal */ }
+            .filter-sidebar { display: none; }
+            .page-title { font-size: 24px; }
+            .search-actions-row { flex-direction: row; }
+            .sort-wrapper { flex: 1; justify-content: flex-end; }
         }
 
         /* View Toggles */
@@ -219,13 +314,14 @@
         .save-listing-btn:hover { color: #331557; }
         
         .listing-title-h3 { text-decoration: none; color: inherit; }
-        .listing-title-h3 h3 { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
+        .listing-title-h3 h3 { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; line-height: 1.4; transition: color 0.2s; }
+        .listing-title-h3:hover h3 { color: #6041E0; }
         
-        .listing-mileage-row { font-size: 13px; color: #4b5563; font-weight: 500; margin-bottom: 8px; }
+        .listing-mileage-row { font-size: 14px; color: #555; font-weight: 500; margin-bottom: 12px; }
         
-        .listing-price-container { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; }
-        .listing-primary-price { font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1; }
-        .listing-monthly-est { font-size: 11px; color: #6b7280; margin-bottom: 12px; }
+        .listing-price-container { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+        .listing-primary-price { font-size: 28px; font-weight: 800; color: #1a1a1a; line-height: 1; letter-spacing: -0.5px; }
+        .listing-monthly-est { font-size: 12px; color: #666; margin-bottom: 16px; }
         
         .listing-specs-summary { font-size: 12px; color: #4b5563; margin-bottom: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
@@ -290,21 +386,77 @@
             </nav>
 
             <!-- Dynamic Page Title -->
-            <div class="search-title-row" style="margin-bottom: 24px;">
+            <div class="modern-search-header">
                 <h1 class="page-title">
                     @php
                         $condition = request('condition') && request('condition') != 'all' ? ucfirst(request('condition')) : 'New and used';
-                        $make = request('make') ? ucwords(str_replace('-', ' ', request('make'))) : '';
-                        $model = request('model') ? ucwords(str_replace('-', ' ', request('model'))) : '';
-                        $year = request('year') ? 'from ' . request('year') : '';
-                        $location = 'near you';
+                        $makeName = request('make') ? ucwords(str_replace('-', ' ', request('make'))) : '';
+                        $modelName = request('model') ? ucwords(str_replace('-', ' ', request('model'))) : '';
+                        $yearVal = request('year') ? 'from ' . request('year') : '';
                     @endphp
-                    {{ $condition }} {{ $make }} {{ $model }} {{ !$make && !$model ? 'vehicles' : '' }} for sale
-                    @if($year)
-                        <span style="color: #555; font-weight: 400; font-size: 0.8em; margin-left: 8px;">{{ $year }}</span>
-                    @endif
-                    <span style="color: #555; font-weight: 400; font-size: 0.8em; margin-left: 8px;">{{ $location }}</span>
+                    {{ $condition }} {{ $makeName }} {{ $modelName }} {{ !$makeName && !$modelName ? 'vehicles' : '' }} for sale
                 </h1>
+                
+                <!-- Filter Pills -->
+                <div class="pills-container">
+                    <button class="filter-trigger-btn" id="mobileFilterBtnTrigger">
+                        <i class="fas fa-sliders-h"></i> Filters
+                    </button>
+                    
+                    @if(request('make'))
+                        <a href="{{ route('listings.search', request()->except(['make', 'model'])) }}" class="pill-item active">
+                            {{ ucwords(str_replace('-', ' ', request('make'))) }} <i class="fas fa-times"></i>
+                        </a>
+                    @endif
+                    
+                    @if(request('model'))
+                        <a href="{{ route('listings.search', request()->except('model')) }}" class="pill-item active">
+                            {{ ucwords(str_replace('-', ' ', request('model'))) }} <i class="fas fa-times"></i>
+                        </a>
+                    @endif
+
+                    @if(!request('make'))
+                        <div class="pill-item" onclick="openFilterWith('make')">Make</div>
+                        <div class="pill-item" onclick="openFilterWith('model')">Model</div>
+                    @endif
+                    
+                    <div class="pill-item" onclick="openFilterWith('price')">Price</div>
+                    <div class="pill-item" onclick="openFilterWith('year')">Year</div>
+                </div>
+
+                <!-- Save & Sort context -->
+                <div class="search-actions-row">
+                    <button class="save-search-btn">
+                        <i class="far fa-heart"></i> Save search
+                    </button>
+                    
+                    <div class="sort-wrapper">
+                        <i class="fas fa-sort-amount-down" style="font-size: 14px; color: #666;"></i>
+                        <span class="sort-label">Sort:</span>
+                        <form id="sortForm" action="{{ route('listings.search') }}" method="GET" style="margin: 0;">
+                            @foreach(request()->except('sort') as $key => $val)
+                                @if(!is_array($val)) <input type="hidden" name="{{ $key }}" value="{{ $val }}"> @endif
+                            @endforeach
+                            <select name="sort" class="sort-select" onchange="document.getElementById('sortForm').submit()" style="border: none; padding: 0 24px 0 4px; font-weight: 800;">
+                                <option value="best_match">Best match</option>
+                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Lowest price</option>
+                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Highest price</option>
+                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Modern Search Bar -->
+                <form action="{{ route('listings.search') }}" method="GET" class="modern-search-bar-row">
+                     @foreach(request()->except('q') as $key => $val)
+                        @if(!is_array($val)) <input type="hidden" name="{{ $key }}" value="{{ $val }}"> @endif
+                    @endforeach
+                    <input type="text" name="q" value="{{ request('q') }}" class="modern-search-bar-input" placeholder='Try: "painted in blue"'>
+                    <div class="modern-search-bar-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </form>
             </div>
 
             <div class="results-main-layout">
@@ -321,30 +473,13 @@
 
                 <!-- Results Column -->
                 <div class="results-column">
-                    <div class="results-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 2px solid #1a1a1a; padding-bottom: 12px;">
+                    <div class="results-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <div class="match-count">{{ $listings->total() }} matches</div>
                         
                         <div style="display: flex; align-items: center;">
-                            <button class="mobile-filter-btn" id="mobileFilterBtn"><i class="fas fa-sliders-h"></i> Filters</button>
-                            <!-- Top View Toggle -->
                              <div class="view-toggle-container">
                                 <button type="button" class="view-toggle-btn active" data-view="list" title="List View"><i class="fas fa-list"></i></button>
                                 <button type="button" class="view-toggle-btn" data-view="grid" title="Grid View"><i class="fas fa-th-large"></i></button>
-                            </div>
-
-                            <div class="sort-wrapper">
-                                <span class="sort-label">Sort by</span>
-                                <form id="sortForm" action="{{ route('listings.search') }}" method="GET" style="margin: 0;">
-                                    @foreach(request()->except('sort') as $key => $val)
-                                        @if(!is_array($val)) <input type="hidden" name="{{ $key }}" value="{{ $val }}"> @endif
-                                    @endforeach
-                                    <select name="sort" class="sort-select" onchange="document.getElementById('sortForm').submit()">
-                                        <option value="best_match">Best match</option>
-                                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Lowest price</option>
-                                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Highest price</option>
-                                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
-                                    </select>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -500,19 +635,29 @@
 
         // Mobile Filter Toggle
         const filterBtn = document.getElementById('mobileFilterBtn');
+        const filterBtnTrigger = document.getElementById('mobileFilterBtnTrigger');
         const filterModal = document.getElementById('mobileFilterModal');
         const filterClose = document.getElementById('mobileFilterClose');
 
-        if(filterBtn && filterModal && filterClose) {
-            filterBtn.addEventListener('click', () => {
-                filterModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
+        function openFilters() {
+            filterModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        if(filterBtn) filterBtn.addEventListener('click', openFilters);
+        if(filterBtnTrigger) filterBtnTrigger.addEventListener('click', openFilters);
+        
+        if(filterClose) {
             filterClose.addEventListener('click', () => {
                 filterModal.classList.remove('active');
                 document.body.style.overflow = '';
             });
         }
+
+        window.openFilterWith = function(type) {
+            openFilters();
+            // Optional: scroll to the specific filter section inside the modal
+        };
     </script>
     <!-- Mobile Filter Modal -->
     <div id="mobileFilterModal" class="mobile-filter-modal">

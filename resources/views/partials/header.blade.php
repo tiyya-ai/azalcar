@@ -67,9 +67,66 @@
                     <i class="far fa-user"></i>
                 </a>
             @endauth
+
+            <button class="header-mobile-toggle" id="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </div>
 </header>
+
+<!-- Mobile Menu Drawer -->
+<div class="mobile-menu-drawer" id="mobile-drawer">
+    <div class="drawer-header">
+        <img src="{{ asset('assets/images/logo.png') }}" alt="AzalCars" class="drawer-logo">
+        <button class="drawer-close" id="drawer-close"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div class="drawer-user-info">
+        @auth
+            <div class="drawer-user-card">
+                <div class="drawer-user-avatar">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+                <div class="drawer-user-details">
+                    <span class="drawer-user-name">{{ auth()->user()->name }}</span>
+                    <span class="drawer-user-email">{{ auth()->user()->email }}</span>
+                </div>
+            </div>
+        @else
+            <button class="drawer-login-btn open-login-modal">
+                <i class="far fa-user"></i> Sign In
+            </button>
+        @endauth
+    </div>
+
+    <nav class="drawer-nav">
+        <a href="{{ route('listings.search') }}"><i class="fas fa-car"></i> Cars for Sale</a>
+        <a href="{{ route('listings.search', ['condition' => 'new']) }}"><i class="fas fa-certificate"></i> New Cars</a>
+        <a href="{{ route('listings.search', ['condition' => 'used']) }}"><i class="fas fa-history"></i> Used Cars</a>
+        <a href="{{ route('news.index') }}"><i class="fas fa-video"></i> News & Videos</a>
+        <a href="{{ route('listings.create') }}"><i class="fas fa-plus-circle"></i> Sell Your Car</a>
+        
+        <div class="drawer-divider"></div>
+        
+        @auth
+            <a href="{{ auth()->user()->is_admin ? route('admin.dashboard') : route('dashboard') }}"><i class="fas fa-columns"></i> Dashboard</a>
+            <a href="{{ auth()->user()->is_admin ? route('admin.messages.index') : route('messages.index') }}"><i class="far fa-envelope"></i> Messages</a>
+            @if(!auth()->user()->is_admin)
+                <a href="{{ route('wallet.index') }}"><i class="fas fa-wallet"></i> My Wallet</a>
+                <a href="{{ route('settings.index') }}"><i class="fas fa-cog"></i> Settings</a>
+            @endif
+            
+            <form action="{{ route('logout') }}" method="POST" style="padding: 0 20px;">
+                @csrf
+                <button type="submit" class="drawer-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        @endauth
+    </nav>
+</div>
+<div class="drawer-overlay" id="drawer-overlay"></div>
 
 <style>
     /* ========== HEADER ========== */
@@ -291,6 +348,189 @@
         .header-btn i {
             font-size: 20px;
         }
+        .header-mobile-toggle {
+            display: flex;
+        }
+    }
+
+    /* ========== MOBILE DRAWER STYLES ========== */
+    .header-mobile-toggle {
+        display: none;
+        background: none;
+        border: none;
+        padding: 5px;
+        font-size: 20px;
+        color: #141817;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-menu-drawer {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 300px;
+        height: 100%;
+        background: #ffffff;
+        z-index: 10001;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        transition: right 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mobile-menu-drawer.active {
+        right: 0;
+    }
+
+    .drawer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 10000;
+        display: none;
+        backdrop-filter: blur(2px);
+    }
+
+    .drawer-overlay.active {
+        display: block;
+    }
+
+    .drawer-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #f1f5f9;
+        height: 60px;
+    }
+
+    .drawer-logo {
+        height: 24px;
+        width: auto;
+    }
+
+    .drawer-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .drawer-user-info {
+        padding: 20px;
+        border-bottom: 1px solid #f1f5f9;
+        background: #f8fafc;
+    }
+
+    .drawer-user-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .drawer-user-avatar {
+        width: 44px;
+        height: 44px;
+        background: #6041E0;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .drawer-user-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .drawer-user-name {
+        font-weight: 700;
+        font-size: 15px;
+        color: #1a1a1a;
+    }
+
+    .drawer-user-email {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .drawer-login-btn {
+        width: 100%;
+        padding: 12px;
+        background: #6041E0;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .drawer-nav {
+        padding: 10px 0;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .drawer-nav a {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 14px 24px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #334155;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .drawer-nav a i {
+        width: 20px;
+        text-align: center;
+        font-size: 16px;
+        color: #94a3b8;
+    }
+
+    .drawer-nav a:hover {
+        background: #f1f5f9;
+        color: #6041E0;
+    }
+
+    .drawer-nav a:hover i {
+        color: #6041E0;
+    }
+
+    .drawer-divider {
+        height: 1px;
+        background: #f1f5f9;
+        margin: 10px 0;
+    }
+
+    .drawer-logout-btn {
+        width: 100%;
+        text-align: left;
+        padding: 14px 4px;
+        background: none;
+        border: none;
+        color: #ef4444;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 </style>
 
@@ -315,6 +555,28 @@
                 }
             });
         }
+
+        // Mobile Drawer logic
+        const mobileToggle = document.getElementById('mobile-menu-toggle');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const drawerClose = document.getElementById('drawer-close');
+        const drawerOverlay = document.getElementById('drawer-overlay');
+
+        function openDrawer() {
+            mobileDrawer.classList.add('active');
+            drawerOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.remove('active');
+            drawerOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (mobileToggle) mobileToggle.addEventListener('click', openDrawer);
+        if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+        if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
 
         // Global logic to override sign-in links to open modal
         const signInLinks = document.querySelectorAll('.header-btn[href*="login"], a[href*="login"], .open-login-modal');
