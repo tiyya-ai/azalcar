@@ -1,0 +1,95 @@
+{
+  "menu": [
+    {
+      "name": "Dashboard",
+      "icon": "menu-icon icon-base ti tabler-smart-home",
+      "slug": "admin.dashboard",
+      "url": "admin"
+    },
+    {
+      "menuHeader": "User Management"
+    },
+    {
+      "name": "Users",
+      "icon": "menu-icon icon-base ti tabler-users",
+      "slug": "admin.users.index",
+      "url": "admin/users"
+    },
+    {
+      "menuHeader": "Vehicle Management"
+    },
+    {
+      "name": "Listings",
+      "icon": "menu-icon icon-base ti tabler-car",
+      "slug": "admin.listings.index",
+      "url": "admin/listings"
+    },
+    {
+      "name": "Attributes",
+      "icon": "menu-icon icon-base ti tabler-list",
+      "slug": "attributes",
+      "submenu": [
+        {
+          "url": "admin/makes",
+          "name": "Makes",
+          "slug": "admin.makes.index"
+        },
+        {
+          "url": "admin/vehicle_models",
+          "name": "Models",
+          "slug": "admin.vehicle_models.index"
+        },
+        {
+          "url": "admin/vehicle_types",
+          "name": "Vehicle Types",
+          "slug": "admin.vehicle_types.index"
+        }
+      ]
+    },
+    {
+      "menuHeader": "Monetization"
+    },
+    {
+      "name": "Packages",
+      "icon": "menu-icon icon-base ti tabler-package",
+      "slug": "admin.packages.index",
+      "url": "admin/packages"
+    },
+    {
+      "name": "Transactions",
+      "icon": "menu-icon icon-base ti tabler-credit-card",
+      "slug": "admin.transactions.index",
+      "url": "admin/transactions"
+    },
+    {
+      "menuHeader": "Communication"
+    },
+    {
+      "name": "Messages",
+      "icon": "menu-icon icon-base ti tabler-message",
+      "slug": "admin.messages.index",
+      "url": "admin/messages"
+    },
+    {
+      "name": "News",
+      "icon": "menu-icon icon-base ti tabler-news",
+      "slug": "admin.news.index",
+      "url": "admin/news"
+    },
+    {
+      "menuHeader": "SEO & System"
+    },
+    {
+      "name": "SEO Settings",
+      "icon": "menu-icon icon-base ti tabler-search",
+      "slug": "admin.seo.index",
+      "url": "admin/seo"
+    },
+    {
+      "name": "Site Settings",
+      "icon": "menu-icon icon-base ti tabler-settings",
+      "slug": "admin.settings.index",
+      "url": "admin/settings"
+    }
+  ]
+}
