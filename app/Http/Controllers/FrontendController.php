@@ -33,42 +33,20 @@ class FrontendController extends Controller
             return view('welcome', compact('makes', 'featuredListings', 'latestListings', 'recentListings'));
         }
 
-        // Get makes with Korean brands prioritized
-        $koreanBrands = ['HYUNDAI', 'KIA', 'GENESIS', 'SSANGYONG', 'DAEWOO', 'RENAULT SAMSUNG', 'SAMSUNG'];
-        $makes = Make::withCount('listings')
-            ->get()
-            ->sortBy(function ($make) use ($koreanBrands) {
-                $isKorean = in_array(strtoupper($make->name), $koreanBrands);
-                // Korean brands get priority 0, others get priority 1
-                return ($isKorean ? '0_' : '1_') . $make->name;
-            })
-            ->values();
+        $makes = Make::withCount('listings')->orderBy('name')->get();
 
-        // Get featured listings with Korean brands prioritized
-        $koreanBrands = ['HYUNDAI', 'KIA', 'GENESIS', 'SSANGYONG', 'DAEWOO', 'RENAULT SAMSUNG', 'SAMSUNG'];
         $featuredListings = Listing::with(['make', 'vehicleModel', 'vehicleType', 'user'])
             ->where('is_featured', true)
             ->where('status', 'active')
-            ->get()
-            ->sortBy(function ($listing) use ($koreanBrands) {
-                $isKorean = in_array(strtoupper($listing->make->name ?? ''), $koreanBrands);
-                // Korean brands first, then by date (newest first)
-                return ($isKorean ? '0_' : '1_') . (9999999999 - $listing->created_at->timestamp);
-            })
+            ->latest()
             ->take(8)
-            ->values();
+            ->get();
             
-        // Get latest listings with Korean brands prioritized
         $latestListings = Listing::with(['make', 'vehicleModel', 'vehicleType', 'user'])
             ->where('status', 'active')
-            ->get()
-            ->sortBy(function ($listing) use ($koreanBrands) {
-                $isKorean = in_array(strtoupper($listing->make->name ?? ''), $koreanBrands);
-                // Korean brands first, then by date (newest first)
-                return ($isKorean ? '0_' : '1_') . (9999999999 - $listing->created_at->timestamp);
-            })
+            ->latest()
             ->take(12)
-            ->values();
+            ->get();
         
         // Get recently viewed from session
         $recentIds = session()->get('recently_viewed', []);
@@ -84,13 +62,7 @@ class FrontendController extends Controller
             });
         }
 
-        // Get latest news
-        $latestNews = \App\Models\News::where('status', 'published')
-            ->latest()
-            ->take(4)
-            ->get();
-
-        return view('welcome', compact('makes', 'featuredListings', 'latestListings', 'recentListings', 'latestNews'));
+        return view('welcome', compact('makes', 'featuredListings', 'latestListings', 'recentListings'));
     }
 
     public function showListing($slug)
@@ -214,12 +186,6 @@ class FrontendController extends Controller
             $query->whereIn('color', $request->color);
         }
 
-        // City/Location filter
-        if ($request->filled('location') || $request->filled('city')) {
-            $location = $request->location ?? $request->city;
-            $query->where('location', 'like', "%{$location}%");
-        }
-
         if ($request->filled('is_exportable')) {
             $query->where('is_exportable', true);
         }
@@ -248,32 +214,9 @@ class FrontendController extends Controller
             return response()->json($listings);
         }
 
-
-        // Get all results with Korean brands prioritized
-        $koreanBrands = ['HYUNDAI', 'KIA', 'GENESIS', 'SSANGYONG', 'DAEWOO', 'RENAULT SAMSUNG', 'SAMSUNG'];
-        $allListings = $query->with(['make', 'vehicleModel', 'vehicleType', 'user'])
-            ->get()
-            ->sortBy(function ($listing) use ($koreanBrands) {
-                $isKorean = in_array(strtoupper($listing->make->name ?? ''), $koreanBrands);
-                // Korean brands first, then by date (newest first)
-                return ($isKorean ? '0_' : '1_') . (9999999999 - $listing->created_at->timestamp);
-            })
-            ->values();
-
-        // Manually paginate the sorted results
-        $perPage = 12;
-        $currentPage = $request->get('page', 1);
-        $listings = new \Illuminate\Pagination\LengthAwarePaginator(
-            $allListings->forPage($currentPage, $perPage),
-            $allListings->count(),
-            $perPage,
-            $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
-
+        $listings = $query->latest()->paginate(12);
         $makes = Make::all();
         $types = VehicleType::all();
-
 
         // Get available years from database
         $availableYears = Listing::select('year')

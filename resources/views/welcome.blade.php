@@ -1378,6 +1378,11 @@
                         ['name' => 'Volkswagen', 'logo' => 'volkswagen.png'],
                         ['name' => 'Lexus', 'logo' => 'lexus.png'],
                         ['name' => 'Subaru', 'logo' => 'subaru.png'],
+                        ['name' => 'Mazda', 'logo' => 'mazda.png'],
+                        ['name' => 'Volvo', 'logo' => 'volvo.png'],
+                        ['name' => 'Peugeot', 'logo' => 'peugeot.png'],
+                        ['name' => 'Citroen', 'logo' => 'citroen.png'],
+                        ['name' => 'Fiat', 'logo' => 'fiat.png'],
                     ];
                 @endphp
                 
@@ -1409,26 +1414,9 @@
                             <img src="{{ asset('assets/images/icon_calculator.png') }}" alt="Calculator" style="width: 72px; height: 72px;">
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                            <h4 style="font-weight: 700; font-size: 16px; margin-bottom: 8px; color: #1a1a1a;">Get an offer</h4>
-                            <p style="font-size: 14px; color: #4b5563; margin-bottom: 16px; line-height: 1.5;">Get a free instant cash offer and sell your car in as little as 24 hours.</p>
-                            <a href="{{ route('listings.create') }}" style="display: inline-block; padding: 8px 20px; border: 1px solid #1a1a1a; border-radius: 20px; font-weight: 700; font-size: 14px; color: #1a1a1a; text-decoration: none; transition: background 0.2s;">Get your offer</a>
-                        </div>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="sell-divider">
-                        <span class="sell-divider-text">OR</span>
-                    </div>
-
-                    <!-- Option 2: List for free -->
-                    <div class="sell-option">
-                        <div style="flex-shrink: 0; width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{{ asset('assets/images/icon_list.png') }}" alt="List" style="width: 72px; height: 72px;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                            <h4 style="font-weight: 700; font-size: 16px; margin-bottom: 8px; color: #1a1a1a;">List for free</h4>
+                            <h4 style="font-weight: 700; font-size: 16px; margin-bottom: 8px; color: #1a1a1a;">List your car</h4>
                             <p style="font-size: 14px; color: #4b5563; margin-bottom: 16px; line-height: 1.5;">Create a free listing and reach millions of car shoppers on azalcars.</p>
-                            <a href="{{ route('listings.create') }}" style="display: inline-block; padding: 8px 20px; border: 1px solid #452276; border-radius: 20px; font-weight: 700; font-size: 14px; color: #452276; text-decoration: none; transition: background 0.2s;">List your car</a>
+                            <a href="{{ route('listings.create') }}" style="display: inline-block; padding: 8px 20px; border: 1px solid #1a1a1a; border-radius: 20px; font-weight: 700; font-size: 14px; color: #1a1a1a; text-decoration: none; transition: background 0.2s;">List your car</a>
                         </div>
                     </div>
 
