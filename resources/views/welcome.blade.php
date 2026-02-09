@@ -1362,9 +1362,6 @@
                         // Korean brands first
                         ['name' => 'Hyundai', 'logo' => 'hyundai.png'],
                         ['name' => 'Kia', 'logo' => 'kia.png'],
-                        ['name' => 'Daewoo', 'logo' => 'daewoo.png'],
-                        ['name' => 'SsangYong', 'logo' => 'ssangyong.png'],
-                        ['name' => 'Renault Samsung', 'logo' => 'renault-samsung.png'],
                         // Other brands
                         ['name' => 'Toyota', 'logo' => 'toyota.png'],
                         ['name' => 'Ford', 'logo' => 'ford.png'],
@@ -1381,8 +1378,9 @@
                         ['name' => 'Mazda', 'logo' => 'mazda.png'],
                         ['name' => 'Volvo', 'logo' => 'volvo.png'],
                         ['name' => 'Peugeot', 'logo' => 'peugeot.png'],
-                        ['name' => 'Citroen', 'logo' => 'citroen.png'],
-                        ['name' => 'Fiat', 'logo' => 'fiat.png'],
+                        ['name' => 'Porsche', 'logo' => 'porsche.png'],
+                        ['name' => 'Tesla', 'logo' => 'tesla.png'],
+                        ['name' => 'Land Rover', 'logo' => 'land-rover.png'],
                     ];
                 @endphp
                 
