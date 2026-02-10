@@ -19,9 +19,20 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
+            # specific directory check
+            if [ -d "laravel_app" ]; then
+              cd laravel_app
+            elif [ -d "domains/azalcar.com/public_html" ]; then
+              cd domains/azalcar.com/public_html
+            elif [ -d "public_html" ]; then
+              cd public_html
+            else
+              echo "Repo directory not found! Listing root:"
+              ls -la
+              exit 1
+            fi
+            
             pwd
-            ls -d laravel_app || echo "laravel_app not found"
-            cd laravel_app || exit 1
             git fetch --all
             git reset --hard origin/main
             /usr/local/lsws/lsphp82/bin/php artisan migrate --force
