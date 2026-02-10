@@ -19,7 +19,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd laravel_app
+            pwd
+            ls -d laravel_app || echo "laravel_app not found"
+            cd laravel_app || exit 1
             git fetch --all
             git reset --hard origin/main
             /usr/local/lsws/lsphp82/bin/php artisan migrate --force
@@ -27,3 +29,5 @@ jobs:
             /usr/local/lsws/lsphp82/bin/php artisan route:cache
             /usr/local/lsws/lsphp82/bin/php artisan view:clear
             /usr/local/lsws/lsphp82/bin/php artisan cache:clear
+            echo "Current Version:"
+            cat public/deploy_test.txt || echo "deploy_test.txt not found"
