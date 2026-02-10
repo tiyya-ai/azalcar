@@ -30,3 +30,5 @@ _archive/
 unused_files/
 test_unzip/
 No nessery/
+
+manual_deploy.php
