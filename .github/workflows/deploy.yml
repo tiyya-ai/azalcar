@@ -11,45 +11,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          host: 193.203.162.199
+          server: 193.203.162.199
           username: azalc1838
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          script: |
-            echo "Starting Auto-Discovery of Laravel Application..."
-            pwd
-            
-            # Find the directory containing the 'artisan' file (limit depth to ensure speed)
-            ARTISAN_PATH=$(find . -maxdepth 5 -name "artisan" -type f | head -n 1)
-            
-            if [ -z "$ARTISAN_PATH" ]; then
-                echo "CRITICAL ERROR: Could not find 'artisan' file. Directory structure:"
-                ls -R
-                exit 1
-            fi
-            
-            TARGET_DIR=$(dirname "$ARTISAN_PATH")
-            echo "Found Laravel Application at: $TARGET_DIR"
-            cd "$TARGET_DIR" || exit 1
-            
-            echo "Deploying to $TARGET_DIR..."
-            
-            # Git Operations
-            git fetch --all
-            git reset --hard origin/main
-            
-            # Laravel Operations
-            PHP_BIN="/usr/local/lsws/lsphp82/bin/php"
-            
-            $PHP_BIN artisan migrate --force
-            $PHP_BIN artisan config:cache
-            $PHP_BIN artisan route:cache
-            $PHP_BIN artisan view:clear
-            $PHP_BIN artisan cache:clear
-            
-            # Diagnostic Timestamp
-            date > public/deploy_test.txt
-            echo "Deployment Finished Successfully."
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ./public_html/
