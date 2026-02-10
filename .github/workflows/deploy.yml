@@ -20,7 +20,8 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd laravel_app
-            git pull origin main
+            git fetch --all
+            git reset --hard origin/main
             /usr/local/lsws/lsphp82/bin/php artisan migrate --force
             /usr/local/lsws/lsphp82/bin/php artisan config:cache
             /usr/local/lsws/lsphp82/bin/php artisan route:cache
