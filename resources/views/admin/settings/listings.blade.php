@@ -68,6 +68,30 @@
                      min="1" max="50" required>
               <div class="form-text">Maximum file size for uploads in MB (1-50)</div>
             </div>
+
+            <hr class="my-4">
+            <div class="col-12">
+              <h6 class="text-primary mb-3">
+                <i class="icon-base ti tabler-calendar me-2"></i>
+                Search Filter Configuration
+              </h6>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="search_year_start" class="form-label">Search Year Start <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="search_year_start" name="search_year_start"
+                     value="{{ old('search_year_start', $settings['search_year_start'] ?? 2000) }}"
+                     min="1950" max="{{ date('Y') }}" required>
+              <div class="form-text">The earliest year to show in search filters</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="search_year_end" class="form-label">Search Year End <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="search_year_end" name="search_year_end"
+                     value="{{ old('search_year_end', $settings['search_year_end'] ?? date('Y') + 1) }}"
+                     min="1950" max="{{ date('Y') + 2 }}" required>
+              <div class="form-text">The latest year to show in search filters</div>
+            </div>
           </div>
 
           <div class="row">

@@ -77,15 +77,15 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <select name="min_year" class="c-select">
                 <option value="">Min Year</option>
-                @for($y=2026; $y>=2005; $y--)
+                @foreach($availableYears ?? [] as $y)
                     <option value="{{ $y }}" {{ request('min_year') == $y ? 'selected' : '' }}>{{ $y }}</option>
-                @endfor
+                @endforeach
             </select>
             <select name="max_year" class="c-select">
                 <option value="">Max Year</option>
-                @for($y=2026; $y>=2005; $y--)
+                @foreach($availableYears ?? [] as $y)
                     <option value="{{ $y }}" {{ request('max_year') == $y ? 'selected' : '' }}>{{ $y }}</option>
-                @endfor
+                @endforeach
             </select>
         </div>
     </div>

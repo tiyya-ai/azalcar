@@ -21,6 +21,8 @@ class ListingSettingsController extends Controller
             'listing_expiry_days' => 'required|integer|min:7|max:365',
             'commission_percentage' => 'required|numeric|min:0|max:50',
             'max_file_size' => 'required|integer|min:1|max:50',
+            'search_year_start' => 'required|integer|min:1950|max:' . date('Y'),
+            'search_year_end' => 'required|integer|min:1950|max:' . (date('Y') + 2),
         ]);
 
         foreach ($validated as $key => $value) {

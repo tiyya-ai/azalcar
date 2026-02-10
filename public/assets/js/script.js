@@ -700,56 +700,6 @@ if (header) {
     document.head.appendChild(style);
 }
 
-// Auth Modal Logic
-document.addEventListener('DOMContentLoaded', function () {
-    const authModal = document.getElementById('auth-modal');
-    const loginTrigger = document.getElementById('login-trigger');
-    const closeAuthModal = document.getElementById('close-auth-modal');
-    const authTabs = document.querySelectorAll('.auth-tab');
-    const authViews = document.querySelectorAll('.auth-view');
-
-    if (loginTrigger && authModal) {
-        loginTrigger.addEventListener('click', function (e) {
-            e.preventDefault();
-            authModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            switchTab('login');
-        });
-    }
-
-    if (closeAuthModal) {
-        closeAuthModal.addEventListener('click', function () {
-            authModal.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-
-    // Close on overlay click
-    if (authModal) {
-        authModal.addEventListener('click', function (e) {
-            if (e.target === authModal) {
-                authModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-    }
-
-    // Tabs Logic
-    authTabs.forEach(tab => {
-        tab.addEventListener('click', function () {
-            const tabId = this.dataset.tab;
-            switchTab(tabId);
-        });
-    });
-
-    function switchTab(tabId) {
-        authTabs.forEach(tab => tab.classList.remove('active'));
-        authViews.forEach(view => view.classList.remove('active'));
-
-        document.querySelector(`.auth-tab[data-tab="${tabId}"]`).classList.add('active');
-        document.getElementById(`${tabId}-view`).classList.add('active');
-    }
-});
 
 // View Toggle Logic
 function setupViewToggle() {
@@ -782,32 +732,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setupViewToggle();
     setupMapView();
 
-    // Form Submissions (Demo)
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const authModal = document.getElementById('auth-modal');
-
-    if (loginForm) {
-        loginForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            alert('Login successful! (Demo)');
-            if (authModal) {
-                authModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-    }
-
-    if (registerForm) {
-        registerForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            alert('Registration successful! (Demo)');
-            if (authModal) {
-                authModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-    }
 });
 
 // Map View Logic

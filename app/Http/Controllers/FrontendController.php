@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreListingRequest;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\Setting;
 use App\Notifications\NewListingPending;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -62,7 +63,9 @@ class FrontendController extends Controller
             });
         }
 
-        return view('welcome', compact('makes', 'featuredListings', 'latestListings', 'recentListings'));
+        $availableYears = $this->getAvailableYears();
+
+        return view('welcome', compact('makes', 'featuredListings', 'latestListings', 'recentListings', 'availableYears'));
     }
 
     public function showListing($slug)
@@ -218,13 +221,7 @@ class FrontendController extends Controller
         $makes = Make::all();
         $types = VehicleType::all();
 
-        // Get available years from database
-        $availableYears = Listing::select('year')
-            ->where('status', 'active')
-            ->distinct()
-            ->orderBy('year', 'desc')
-            ->pluck('year')
-            ->toArray();
+        $availableYears = $this->getAvailableYears();
 
         return view('listings.index', compact('listings', 'makes', 'types', 'availableYears'));
     }
@@ -611,5 +608,23 @@ class FrontendController extends Controller
         $user->notify(new \App\Notifications\ListingPromoted($listing, $package));
 
         return redirect()->route('listings.show', $slug)->with('success', 'Listing promoted successfully! Your ad is now boosted.');
+    }
+
+    private function getAvailableYears()
+    {
+        $startYear = Setting::get('search_year_start', 2000);
+        $endYear = Setting::get('search_year_end', date('Y') + 1);
+
+        if ($startYear && $endYear && $startYear <= $endYear) {
+            return range($endYear, $startYear);
+        }
+
+        // Fallback to database years
+        return Listing::select('year')
+            ->where('status', 'active')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
     }
 }
