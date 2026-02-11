@@ -11,10 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: 193.203.162.199
-          username: azalc1838
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ./public_html/
+      - name: Deploy via Custom PHP Script
+        env:
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: php manual_deploy.php
