@@ -26,6 +26,22 @@
     @include('partials.header')
 
     <main class="main-content">
+        @if(session('success'))
+            <div class="container mt-4">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="container mt-4">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                </div>
+            </div>
+        @endif
+
         @yield('content')
     </main>
 

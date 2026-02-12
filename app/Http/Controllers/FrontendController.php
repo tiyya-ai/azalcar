@@ -362,7 +362,7 @@ class FrontendController extends Controller
         $data = $request->except('gallery');
         $data['user_id'] = auth()->id();
         $data['slug'] = Str::slug($request->title . '-' . uniqid());
-        $data['status'] = 'pending'; // Moderation queue
+        $data['status'] = 'active'; // Approved immediately for better UX as requested
 
         $data['package_id'] = $package->id;
         $data['expired_at'] = $request->expired_at ?? now()->addDays($package->duration_days);
@@ -395,7 +395,7 @@ class FrontendController extends Controller
             $admin->notify(new \App\Notifications\NewListingPending($listing));
         }
 
-        return redirect()->route('listings.show', $listing->slug)->with('success', 'Listing created successfully! Pending approval.');
+        return redirect()->route('listings.show', $listing->slug)->with('success', 'Your car has been published successfully and is now live on the front page!');
             });
         } catch (\Exception $e) {
             Log::error('Listing creation failed', [

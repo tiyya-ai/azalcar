@@ -4895,6 +4895,44 @@ textarea {
     transform: translateY(-2px);
 }
 
+/* Flash Messages / Alerts */
+.alert {
+    padding: 15px 20px;
+    margin: 20px auto;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    max-width: 1200px;
+    animation: slideDownAlert 0.4s ease-out;
+}
+
+.alert-success {
+    color: #065f46;
+    background-color: #ecfdf5;
+    border-color: #10b981;
+}
+
+.alert-danger {
+    color: #991b1b;
+    background-color: #fef2f2;
+    border-color: #ef4444;
+}
+
+@keyframes slideDownAlert {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
