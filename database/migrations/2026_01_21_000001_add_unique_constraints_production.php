@@ -18,14 +18,7 @@ return new class extends Migration
         // 1. Ensure unique constraint on transactions reference_id
         // This prevents duplicate Stripe webhook processing
         Schema::table('transactions', function (Blueprint $table) {
-            // Check if index already exists before adding
-            $indexExists = DB::select(
-                "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
-                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'transactions' AND INDEX_NAME = 'unique_reference_id'",
-                [DB::getDatabaseName()]
-            );
-            
-            if (empty($indexExists)) {
+            if (!$this->indexExists('transactions', 'unique_reference_id')) {
                 $table->unique('reference_id', 'unique_reference_id');
             }
         });
@@ -34,13 +27,7 @@ return new class extends Migration
         // This prevents multiple active reservations on the same listing
         // Note: MariaDB doesn't support partial indexes, so we use a composite index
         Schema::table('reservations', function (Blueprint $table) {
-            $indexExists = DB::select(
-                "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
-                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'reservations' AND INDEX_NAME = 'idx_listing_status_unique'",
-                [DB::getDatabaseName()]
-            );
-            
-            if (empty($indexExists)) {
+            if (!$this->indexExists('reservations', 'idx_listing_status_unique')) {
                 // Add composite index - application logic will enforce single active reservation
                 $table->index(['listing_id', 'status'], 'idx_listing_status_unique');
             }
@@ -49,13 +36,7 @@ return new class extends Migration
         // 3. Add unique constraint on reviews (user_id, seller_id)
         // This prevents duplicate reviews from same user to same seller
         Schema::table('reviews', function (Blueprint $table) {
-            $indexExists = DB::select(
-                "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
-                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'reviews' AND INDEX_NAME = 'unique_user_seller_review'",
-                [DB::getDatabaseName()]
-            );
-            
-            if (empty($indexExists)) {
+            if (!$this->indexExists('reviews', 'unique_user_seller_review')) {
                 $table->unique(['user_id', 'seller_id'], 'unique_user_seller_review');
             }
         });
@@ -63,13 +44,7 @@ return new class extends Migration
         // 4. Add unique constraint on favorites (user_id, listing_id)
         // This prevents duplicate favorites
         Schema::table('favorites', function (Blueprint $table) {
-            $indexExists = DB::select(
-                "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
-                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'favorites' AND INDEX_NAME = 'unique_user_listing_favorite'",
-                [DB::getDatabaseName()]
-            );
-            
-            if (empty($indexExists)) {
+            if (!$this->indexExists('favorites', 'unique_user_listing_favorite')) {
                 $table->unique(['user_id', 'listing_id'], 'unique_user_listing_favorite');
             }
         });
@@ -77,23 +52,19 @@ return new class extends Migration
         // 5. Add unique constraint on leads for 24-hour deduplication
         // Prevents duplicate lead tracking from same IP/User-Agent within 24 hours
         Schema::table('leads', function (Blueprint $table) {
-            $indexExists = DB::select(
-                "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
-                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'leads' AND INDEX_NAME = 'unique_lead_tracking'",
-                [DB::getDatabaseName()]
-            );
-            
-            if (empty($indexExists)) {
+            if (!$this->indexExists('leads', 'unique_lead_tracking')) {
                 // First, remove duplicates - keep only the oldest record for each combination
-                DB::statement("
-                    DELETE l1 FROM leads l1
-                    INNER JOIN leads l2 
-                    WHERE l1.id > l2.id 
-                    AND l1.listing_id = l2.listing_id 
-                    AND l1.user_id <=> l2.user_id
-                    AND l1.type = l2.type 
-                    AND l1.ip_address = l2.ip_address
-                ");
+                if (DB::getDriverName() !== 'sqlite') {
+                    DB::statement("
+                        DELETE l1 FROM leads l1
+                        INNER JOIN leads l2 
+                        WHERE l1.id > l2.id 
+                        AND l1.listing_id = l2.listing_id 
+                        AND l1.user_id <=> l2.user_id
+                        AND l1.type = l2.type 
+                        AND l1.ip_address = l2.ip_address
+                    ");
+                }
                 
                 // Now add the unique constraint
                 $table->unique(['listing_id', 'user_id', 'type', 'ip_address'], 'unique_lead_tracking');
@@ -104,13 +75,7 @@ return new class extends Migration
         // This should already exist from migration 2026_01_18_122525
         // But we verify it here
         Schema::table('conversations', function (Blueprint $table) {
-            $indexExists = DB::select(
-                "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
-                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'conversations' AND INDEX_NAME = 'conversations_listing_id_buyer_id_seller_id_unique'",
-                [DB::getDatabaseName()]
-            );
-            
-            if (empty($indexExists)) {
+            if (!$this->indexExists('conversations', 'conversations_listing_id_buyer_id_seller_id_unique')) {
                 $table->unique(['listing_id', 'buyer_id', 'seller_id']);
             }
         });
@@ -179,11 +144,16 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Helper method to check if index exists
-     */
     private function indexExists(string $table, string $index): bool
     {
+        if (DB::getDriverName() === 'sqlite') {
+            $result = DB::select(
+                "SELECT 1 FROM sqlite_master WHERE type = 'index' AND tbl_name = ? AND name = ?",
+                [$table, $index]
+            );
+            return !empty($result);
+        }
+
         $result = DB::select(
             "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
              WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME = ?",
@@ -191,5 +161,10 @@ return new class extends Migration
         );
         
         return !empty($result);
+    }
+    
+    private function checkTableSchema(string $table, string $index): bool
+    {
+        return $this->indexExists($table, $index);
     }
 };
