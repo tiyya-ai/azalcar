@@ -15,7 +15,7 @@ jobs:
 
       - name: 📦 Build Assets
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
 
       - name: 🚀 Sync Changed Files to FTP

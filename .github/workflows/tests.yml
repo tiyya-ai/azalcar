@@ -40,7 +40,7 @@ jobs:
 
       - name: Install NPM dependencies & Build Assets
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
 
       - name: Copy environment file
