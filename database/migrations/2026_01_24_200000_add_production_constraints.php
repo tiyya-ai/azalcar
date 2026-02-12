@@ -120,11 +120,13 @@ return new class extends Migration
             }
         });
 
-        // Add check constraints for business rules
-        DB::statement('ALTER TABLE listings ADD CONSTRAINT listings_price_positive CHECK (price >= 0)');
-        DB::statement('ALTER TABLE listings ADD CONSTRAINT listings_year_valid CHECK (year >= 1900 AND year <= ' . (date('Y') + 2) . ')');
-        DB::statement('ALTER TABLE packages ADD CONSTRAINT packages_price_positive CHECK (price >= 0)');
-        DB::statement('ALTER TABLE packages ADD CONSTRAINT packages_duration_positive CHECK (duration_days > 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            // Add check constraints for business rules - MySQL only for ALTER TABLE
+            DB::statement('ALTER TABLE listings ADD CONSTRAINT listings_price_positive CHECK (price >= 0)');
+            DB::statement('ALTER TABLE listings ADD CONSTRAINT listings_year_valid CHECK (year >= 1900 AND year <= ' . (date('Y') + 2) . ')');
+            DB::statement('ALTER TABLE packages ADD CONSTRAINT packages_price_positive CHECK (price >= 0)');
+            DB::statement('ALTER TABLE packages ADD CONSTRAINT packages_duration_positive CHECK (duration_days > 0)');
+        }
     }
 
     /**
@@ -133,10 +135,12 @@ return new class extends Migration
     public function down(): void
     {
         // Drop check constraints
-        DB::statement('ALTER TABLE listings DROP CONSTRAINT IF EXISTS listings_price_positive');
-        DB::statement('ALTER TABLE listings DROP CONSTRAINT IF EXISTS listings_year_valid');
-        DB::statement('ALTER TABLE packages DROP CONSTRAINT IF EXISTS packages_price_positive');
-        DB::statement('ALTER TABLE packages DROP CONSTRAINT IF EXISTS packages_duration_positive');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE listings DROP CONSTRAINT IF EXISTS listings_price_positive');
+            DB::statement('ALTER TABLE listings DROP CONSTRAINT IF EXISTS listings_year_valid');
+            DB::statement('ALTER TABLE packages DROP CONSTRAINT IF EXISTS packages_price_positive');
+            DB::statement('ALTER TABLE packages DROP CONSTRAINT IF EXISTS packages_duration_positive');
+        }
 
         // Drop indexes
         Schema::table('listings', function (Blueprint $table) {
@@ -185,7 +189,20 @@ return new class extends Migration
      */
     private function indexExists(string $table, string $index): bool
     {
-        $indexes = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$index]);
-        return !empty($indexes);
+        if (DB::getDriverName() === 'sqlite') {
+            $result = DB::select(
+                "SELECT 1 FROM sqlite_master WHERE type = 'index' AND tbl_name = ? AND name = ?",
+                [$table, $index]
+            );
+            return !empty($result);
+        }
+
+        $result = DB::select(
+            "SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS 
+             WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME = ?",
+            [DB::getDatabaseName(), $table, $index]
+        );
+        
+        return !empty($result);
     }
 };
