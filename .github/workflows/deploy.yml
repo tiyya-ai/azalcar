@@ -10,8 +10,23 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # مهم جداً لمعرفة الملفات التي تغيرت
 
-      - name: Deploy via Custom PHP Script
-        env:
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: php manual_deploy.php
+      - name: 🚀 Sync Changed Files to FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.5
+        with:
+          server: 193.203.162.199
+          username: admin_azal
+          password: ${{ secrets.FTP_PASSWORD }}
+          # هذه الأداة سترفع فقط الملفات التي تغيرت منذ آخر commit ناجح
+          local-dir: ./
+          server-dir: /laravel_app/
+          exclude: |
+            .git*
+            .github*
+            node_modules/
+            vendor/
+            tests/
+            storage/logs/
+            *.sqlite
