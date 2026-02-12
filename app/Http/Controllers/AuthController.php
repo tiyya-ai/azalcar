@@ -24,7 +24,8 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // Redirect based on user role
-            $redirectUrl = Auth::user()->is_admin ? route('admin.dashboard') : route('dashboard');
+            $user = Auth::user();
+            $redirectUrl = $user->is_admin ? route('admin.dashboard') : route('dashboard');
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -33,7 +34,8 @@ class AuthController extends Controller
                 ]);
             }
 
-            return redirect($redirectUrl);
+            // use intended() to take user back where they were, or to the dashboard
+            return redirect()->intended($redirectUrl);
         }
 
         $errors = ['email' => 'The provided credentials do not match our records.'];
@@ -77,7 +79,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         // Redirect based on user role
-        $redirectUrl = Auth::user()->is_admin ? route('admin.dashboard') : route('dashboard');
+        $redirectUrl = $user->is_admin ? route('admin.dashboard') : route('dashboard');
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -86,7 +88,7 @@ class AuthController extends Controller
             ]);
         }
 
-        return redirect($redirectUrl);
+        return redirect()->intended($redirectUrl);
     }
 
     public function logout(Request $request)
