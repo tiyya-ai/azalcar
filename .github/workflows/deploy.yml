@@ -13,11 +13,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📦 Build Assets
-        run: |
-          npm install --legacy-peer-deps
-          npm run build
-
       - name: 🚀 Sync Changed Files to FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
