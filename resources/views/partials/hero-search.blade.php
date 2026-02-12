@@ -1,4 +1,4 @@
-ii@php
+@php
     // Attempt to get real makes and models from the database
     try {
         $makes = \App\Models\Make::with('models')->orderBy('name')->get();
@@ -12,10 +12,14 @@ ii@php
             })];
         });
     } catch (\Exception $e) {
-        $makesList = collect(); // Fallback to empty instead of fake data for better debugging
+        $makesList = collect(); 
         $modelsByMake = [];
     }
     $jsonModels = json_encode($modelsByMake);
+    
+    // Generate years for dropdown
+    $currentYear = date('Y');
+    $years = range($currentYear + 1, 1990);
 @endphp
 
 <section class="hero-section">
@@ -116,16 +120,12 @@ ii@php
                             </div>
                             <div class="hero-filter">
                                 <label for="year" class="hero-filter-label">YEAR</label>
-                                <input
-                                    type="text"
-                                    name="year"
-                                    id="year"
-                                    value="{{ request('year') }}"
-                                    maxlength="4"
-                                    oninput="updateMatches()"
-                                    class="hero-filter-input"
-                                    placeholder="Enter Year"
-                                >
+                                <select name="year" id="year" onchange="updateMatches()" class="hero-filter-input">
+                                    <option value="">All Years</option>
+                                    @foreach($years as $y)
+                                        <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="hero-filter hero-filter-button">
                                 <button type="submit" class="hero-filter-cta">
@@ -174,14 +174,22 @@ ii@php
         const makeSelect = document.getElementById('make');
         const modelSelect = document.getElementById('model');
         const selectedMake = makeSelect.value;
+        
+        // Reset and populate model select
         modelSelect.innerHTML = '<option value="">All models</option>';
+        
         if (selectedMake && vehicleData.models[selectedMake]) {
             vehicleData.models[selectedMake].forEach(model => {
                 const option = document.createElement('option');
                 option.value = model.slug;
                 option.textContent = model.name;
+                // Preserve selection if it was there before from request or session
+                if (model.slug === "{{ request('model') }}") {
+                    option.selected = true;
+                }
                 modelSelect.appendChild(option);
             });
+            console.log(`Loaded models for: ${selectedMake}`);
         }
         updateMatches();
     }
@@ -260,7 +268,7 @@ ii@php
 
     document.addEventListener('DOMContentLoaded', () => {
         const makeValue = document.getElementById('make').value;
-        if (makeValue && !['Dodge', 'Ford', 'Nissan'].includes(makeValue)) {
+        if (makeValue) {
             handleMakeChange();
         }
     });
