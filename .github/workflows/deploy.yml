@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0 # مهم جداً لمعرفة الملفات التي تغيرت
 
       - name: 🚀 Sync Changed Files to FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: 193.203.162.199
           username: admin_azal
